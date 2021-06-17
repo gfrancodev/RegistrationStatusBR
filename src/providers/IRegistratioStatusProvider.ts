@@ -1,3 +1,3 @@
 export interface IRegistratioStatusProvider {
-    fetchDocumentStatus(documentId: string): Promise<Object | Error>
+    fetchDocumentIdStatus(documentId: string): Promise<Object | Error>
 }

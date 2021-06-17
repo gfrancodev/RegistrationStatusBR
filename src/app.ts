@@ -1,8 +1,8 @@
+/* eslint-disable handle-callback-err */
+/* eslint-disable no-unused-vars */
 import express from 'express'
 import cors from 'cors'
 import router from './routes'
-import { config } from 'dotenv'
-config()
 
 class App {
   public express: express.Application
@@ -10,7 +10,7 @@ class App {
   constructor () {
     this.express = express()
     this.middleware()
-    this.routes()
+    this.router()
   }
 
   private middleware () {
@@ -18,7 +18,7 @@ class App {
     this.express.use(cors())
   }
 
-  private routes () {
+  private router () {
     this.express.use(router)
   }
 }

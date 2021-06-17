@@ -35,14 +35,14 @@ class RegistrationStatusProvider implements IRegistratioStatusProvider {
     private validateCNPJ: IValidate
   ){}
 
-  async fetchDocumentStatus (documentId: string): Promise<Object | Error> {
+  async fetchDocumentIdStatus (documentId: string): Promise<Object | Error> {
 
     const CNPJ = this.validateCNPJ.methodBasic(documentId)
     const CPF = this.validateCPF.methodBasic(documentId)
 
     if (!CNPJ && !CPF) { throw new SintaxeException('') }
 
-    const browser = await launch({ headless: false })
+    const browser = await launch()
     const pageInitial = await browser.newPage(); 
     await pageInitial.setExtraHTTPHeaders(this.headers); 
     await pageInitial.goto(this.url)
@@ -105,35 +105,26 @@ class RegistrationStatusProvider implements IRegistratioStatusProvider {
         if (document.getElementById('mensagem') !== null ) { 
           return { error: "connection" } 
         }
+
+        let status = document.getElementsByTagName('span')[2].innerText.split(': ')[1]
+
+        if (status === undefined) { status = document.getElementsByTagName('u')[0].innerText }
+
         return { //@ts-ignore
           doc: document.getElementsByTagName('span')[0].innerText,//@ts-ignore 
           authority: document.getElementsByTagName('span')[1].innerText,//@ts-ignore
-          status: document.getElementsByTagName('span')[2].innerText.split(': ')[1] 
+          status
         } //@ts-ignore    
       })
     }
 
-    if (CNPJ) {
-      result = await pageResult.evaluate(() => { //@ts-ignore
-        if (document.getElementById('mensagem') !== null) { 
-          return { error: "connection" } 
-        }
-        return { //@ts-ignore
-          doc: document.getElementsByTagName('span')[0].innerText,//@ts-ignore 
-          authority: document.getElementsByTagName('span')[1].innerText,//@ts-ignore
-          status: document.getElementsByTagName('u')[0].innerText
-         } //@ts-ignore     
-      })
-    }
-
     /**
-     * 
-     * 
+     * it is necessary to wait for the response of the request for the error to be handled.
      */
 
-    if (result.error !== undefined && result.error === "invalid") { throw new SintaxeException() }
+    if (result.error === "invalid") { throw new SintaxeException() }
 
-    if (result.error !== undefined && result.error === "connection") { throw new ConnectionException() }
+    if (result.error === "connection") { throw new ConnectionException() }
 
     return result
   }

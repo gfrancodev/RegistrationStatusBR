@@ -9,6 +9,6 @@ export class RegistrationStatusUseCase {
   ) {}
 
   public execute (request: RegistrationStatusDTO): Promise<Object | Error> {
-    return this.RegistrationStatusProvider.fetchDocumentStatus(request.documentId)
+    return this.RegistrationStatusProvider.fetchDocumentIdStatus(request.documentId)
   }
 }
